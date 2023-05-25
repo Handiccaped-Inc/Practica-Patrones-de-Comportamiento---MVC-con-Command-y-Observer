@@ -8,4 +8,6 @@ import java.util.List;
  *
  * @author Libardo, Julio
  */
-public interface IProductRepository extends IRepository<Product>{}
+public interface IProductRepository extends IRepository<Product>{
+    public List<Product> findByCategory(Long id);
+}

@@ -42,7 +42,7 @@ public class GUIMain extends javax.swing.JFrame {
         
         //Categorias
         
-        this.categoriesGui = new GUICategories(categoryService);
+        this.categoriesGui = new GUICategories(categoryService, productService);
         this.categoriesTableGui = new GUICategoriesTable(categoryService);
 
     }

@@ -26,7 +26,6 @@ public class GUICategoriesTable extends javax.swing.JFrame implements Observador
     public GUICategoriesTable(CategoryService categoryService) {
         initComponents();
         this.categoryService = categoryService;
-        tblCategories.getselected
     }
 
     /**
@@ -43,6 +42,7 @@ public class GUICategoriesTable extends javax.swing.JFrame implements Observador
         tblCategories = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Tabla Categorias");
 
         tblCategories.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {

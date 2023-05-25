@@ -7,6 +7,7 @@ package co.edu.unicauca.openmarket.presentation;
 
 import co.edu.unicauca.openmarket.domain.Category;
 import co.edu.unicauca.openmarket.domain.service.CategoryService;
+import co.edu.unicauca.openmarket.domain.service.ProductService;
 import co.edu.unicauca.openmarket.infra.Messages;
 import co.edu.unicauca.openmarket.presentation.commands.OMAddCategoryCommand;
 import co.edu.unicauca.openmarket.presentation.commands.OMInvoker;
@@ -18,14 +19,19 @@ import co.edu.unicauca.openmarket.presentation.commands.OMInvoker;
 public class GUICategories extends javax.swing.JFrame {
 
     CategoryService categoryService;
+    ProductService productService;
     OMInvoker ominvoker;
+    
+    //Guis
+    GUIPostCategoryCreation postCategoryCreationGui;
     /**
      * 
      * Creates new form GUICategories
      */
-    public GUICategories(CategoryService categoryService) {
+    public GUICategories(CategoryService categoryService, ProductService productService) {
         initComponents();
         this.categoryService = categoryService;
+        this.productService = productService;
         ominvoker = new OMInvoker();
         this.btnDeshacer.setVisible(ominvoker.hasMoreCommands());
     }
@@ -49,6 +55,7 @@ public class GUICategories extends javax.swing.JFrame {
         txtId = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Gestion Categorias");
 
         jpaneOptions.setLayout(new java.awt.GridLayout());
 
@@ -124,16 +131,12 @@ public class GUICategories extends javax.swing.JFrame {
         String name = txtName.getText().trim();
         Category newCategory = new Category(id, name);
         
-        OMAddCategoryCommand addCommand = new OMAddCategoryCommand(newCategory, categoryService);
+        OMAddCategoryCommand addCommand = new OMAddCategoryCommand(newCategory, categoryService, productService);
         ominvoker.addCommand(addCommand);
-        ominvoker.execute();
-        if (addCommand.getResult()) {
-            Messages.showMessageDialog("Se grabó con éxito", "Atención");
-        } else {
-            Messages.showMessageDialog("Error al grabar, lo siento mucho", "Atención");
-        }
+        postCategoryCreationGui = new GUIPostCategoryCreation(addCommand, productService, ominvoker);
+        postCategoryCreationGui.setVisible(true);
         this.btnDeshacer.setVisible(ominvoker.hasMoreCommands());
-
+        productService.addObservador(postCategoryCreationGui);
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnDeshacerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeshacerActionPerformed

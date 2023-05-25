@@ -1,5 +1,6 @@
 package co.edu.unicauca.openmarket.access;
 
+import co.edu.unicauca.openmarket.domain.Category;
 import co.edu.unicauca.openmarket.domain.Product;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -67,6 +68,7 @@ public class ProductRepository implements IProductRepository {
                 newProduct.setProductId(rs.getLong("productId"));
                 newProduct.setName(rs.getString("name"));
                 newProduct.setDescription(rs.getString("description"));
+                newProduct.setCategory(new Category(rs.getLong("categoryId"), ""));
 
                 products.add(newProduct);
             }
@@ -82,8 +84,10 @@ public class ProductRepository implements IProductRepository {
         // SQL statement for creating a new table
         String sql = "CREATE TABLE IF NOT EXISTS products (\n"
                 + "	productId integer PRIMARY KEY,\n"
+                + "	categoryId integer,\n"
                 + "	name text NOT NULL,\n"
-                + "	description text NULL\n"
+                + "	description text NULL,\n"
+                + "      FOREIGN KEY (categoryId) REFERENCES category(categoryId)\n"
                 + ");";
 
         try {
@@ -132,13 +136,16 @@ public class ProductRepository implements IProductRepository {
             //this.connect();
 
             String sql = "UPDATE  products "
-                    + "SET name=?, description=?"
+                    + "SET name=?, description=?, categoryId=?"
                     + "WHERE productId = ?";
 
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, product.getName());
             pstmt.setString(2, product.getDescription());
-            pstmt.setLong(3, id);
+            Category productCategory = product.getCategory();
+            pstmt.setLong(3, productCategory == null ? 0 : productCategory.getCategoryId());
+            pstmt.setLong(4, id);
+
             pstmt.executeUpdate();
             //this.disconnect();
             return true;
@@ -188,6 +195,8 @@ public class ProductRepository implements IProductRepository {
                 prod.setProductId(res.getLong("productId"));
                 prod.setName(res.getString("name"));
                 prod.setDescription(res.getString("description"));
+                prod.setCategory(new Category(res.getLong("categoryId"), ""));
+
                 return prod;
             } else {
                 return null;
@@ -198,6 +207,35 @@ public class ProductRepository implements IProductRepository {
             Logger.getLogger(ProductRepository.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
+    }
+
+    @Override
+    public List<Product> findByCategory(Long id) {
+        List<Product> products = new ArrayList<>();
+        try {
+
+            String sql = "SELECT * FROM products  "
+                    + "WHERE categoryId = ?";
+            //this.connect();
+
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, id);
+            ResultSet res = pstmt.executeQuery();
+
+            while (res.next()) {
+                Product newProduct = new Product();
+                newProduct.setProductId(res.getLong("productId"));
+                newProduct.setName(res.getString("name"));
+                newProduct.setDescription(res.getString("description"));
+                newProduct.setCategory(new Category(res.getLong("categoryId"), ""));
+                products.add(newProduct);
+            }
+            //this.disconnect();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ProductRepository.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return products;
     }
 
 }

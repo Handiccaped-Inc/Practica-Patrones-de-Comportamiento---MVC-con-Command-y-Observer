@@ -48,6 +48,10 @@ public class ProductService extends Observado {
 
         return products;
     }
+    
+    public List<Product> findProductByCategory(Long id){
+        return repository.findByCategory(id);
+    }
 
     public Product findProductById(Long id) {
         return repository.findById(id);

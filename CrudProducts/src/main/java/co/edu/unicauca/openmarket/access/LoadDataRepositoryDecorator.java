@@ -13,9 +13,10 @@ import java.util.List;
  *
  * @author ahurtado
  */
-public class LoadDataRepositoryDecorator implements IProductRepository{
+public class LoadDataRepositoryDecorator implements IProductRepository {
+
     IProductRepository repository;
-    
+
     @Override
     public boolean save(Product newProduct) {
         return repository.save(newProduct);
@@ -32,7 +33,7 @@ public class LoadDataRepositoryDecorator implements IProductRepository{
     }
 
     @Override
-    public Product findById(Long id){
+    public Product findById(Long id) {
         return repository.findById(id);
     }
 
@@ -40,15 +41,20 @@ public class LoadDataRepositoryDecorator implements IProductRepository{
     public List<Product> findAll() {
         return repository.findAll();
     }
-    
-    public boolean loadProducts(File file){
-        List<Product> products = new ArrayList<>(); 
+
+    public boolean loadProducts(File file) {
+        List<Product> products = new ArrayList<>();
         //abrir archivo
         //leer productos y guardarlos en una lista de productos
-        for (Product each: products){
+        for (Product each : products) {
             repository.save(each);
         }
         return true;
     }
-    
+
+    @Override
+    public List<Product> findByCategory(Long id) {
+        return repository.findByCategory(id);
+    }
+
 }
