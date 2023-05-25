@@ -5,6 +5,8 @@ import co.edu.unicauca.openmarket.domain.service.ProductService;
 import co.edu.unicauca.openmarket.infra.Messages;
 import co.edu.unicauca.openmarket.presentation.commands.OMAddProductCommand;
 import co.edu.unicauca.openmarket.presentation.commands.OMCommand;
+import co.edu.unicauca.openmarket.presentation.commands.OMDeleteProductCommand;
+import co.edu.unicauca.openmarket.presentation.commands.OMEditProductCommand;
 import co.edu.unicauca.openmarket.presentation.commands.OMInvoker;
 import javax.swing.JOptionPane;
 
@@ -57,7 +59,7 @@ public class GUIProducts extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         txtDescription = new javax.swing.JTextArea();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Productos");
 
         pnlSouth.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -215,6 +217,9 @@ public class GUIProducts extends javax.swing.JFrame {
         }
         Long productId = Long.parseLong(txtId.getText());
         Product prod = productService.findProductById(productId);
+        if(addOption){
+            return;
+        }
         if (prod == null) {
             Messages.showMessageDialog("El identificador del producto no existe", "Error");
             txtId.setText("");
@@ -233,8 +238,13 @@ public class GUIProducts extends javax.swing.JFrame {
             return;
         }
         Long productId = Long.parseLong(id);
+
+        OMDeleteProductCommand deleteCommand = new OMDeleteProductCommand(productId, productService);
+        ominvoker.addCommand(deleteCommand);
+
         if (Messages.showConfirmDialog("Está seguro que desea eliminar este producto?", "Confirmación") == JOptionPane.YES_NO_OPTION) {
-            if (productService.deleteProduct(productId)) {
+            ominvoker.execute();
+            if (deleteCommand.getResult()) {
                 Messages.showMessageDialog("Producto eliminado con éxito", "Atención");
                 stateInitial();
                 cleanControls();
@@ -243,25 +253,21 @@ public class GUIProducts extends javax.swing.JFrame {
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
-        GUIProductsFind instance = new GUIProductsFind(this, false, productService);
-        instance.setVisible(true);
-        productService.addObservador(instance);
+        GUIProductsFind findProductsGui = new GUIProductsFind(this, false, productService);
+        findProductsGui.setVisible(true);
+        productService.addObservador(findProductsGui);
     }//GEN-LAST:event_btnFindActionPerformed
 
     private void btnDeshacerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeshacerActionPerformed
         // TODO add your handling code here:
-        
-        ominvoker.unexecute();      
+
+        ominvoker.unexecute();
         this.btnRehacer.setVisible(ominvoker.hasUnexecutedCommands());
         this.btnDeshacer.setVisible(ominvoker.hasMoreCommands());
-        
-        
     }//GEN-LAST:event_btnDeshacerActionPerformed
 
     private void btnRehacerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRehacerActionPerformed
         ominvoker.reexecute();
-        
-        
         this.btnRehacer.setVisible(ominvoker.hasUnexecutedCommands());
         this.btnDeshacer.setVisible(ominvoker.hasMoreCommands());
     }//GEN-LAST:event_btnRehacerActionPerformed
@@ -286,7 +292,7 @@ public class GUIProducts extends javax.swing.JFrame {
         btnCerrar.setVisible(true);
         btnSave.setVisible(false);
         btnFind.setVisible(true);
-        txtId.setEnabled(false);
+        txtId.setEnabled(true);
         txtName.setEnabled(false);
         txtDescription.setEnabled(false);
         btnDeshacer.setVisible(ominvoker.hasMoreCommands());
@@ -323,7 +329,7 @@ public class GUIProducts extends javax.swing.JFrame {
         btnCerrar.setVisible(false);
         btnSave.setVisible(true);
         btnFind.setVisible(false);
-        txtId.setEnabled(false);
+        txtId.setEnabled(true);
         txtName.setEnabled(true);
         txtDescription.setEnabled(true);
         btnDeshacer.setVisible(ominvoker.hasMoreCommands());
@@ -337,13 +343,14 @@ public class GUIProducts extends javax.swing.JFrame {
     }
 
     private void addProduct() {
+        Long id = Long.parseLong(txtId.getText().trim());
         String name = txtName.getText().trim();
         String description = txtDescription.getText().trim();
-        Product product = new Product(0L, name, description,0);
-        OMAddProductCommand comm= new OMAddProductCommand(product, productService);
+        Product product = new Product(id, name, description, 0);
+        OMAddProductCommand comm = new OMAddProductCommand(product, productService);
         ominvoker.addCommand(comm);
         ominvoker.execute();
-        if (comm.result()) {
+        if (comm.getResult()) {
             Messages.showMessageDialog("Se grabó con éxito", "Atención");
             cleanControls();
             stateInitial();
@@ -360,11 +367,15 @@ public class GUIProducts extends javax.swing.JFrame {
             return;
         }
         Long productId = Long.parseLong(id);
-        Product prod = new Product();
-        prod.setName(txtName.getText().trim());
-        prod.setDescription(txtDescription.getText().trim());
+        Product editedProduct = new Product();
+        editedProduct.setProductId(productId);
+        editedProduct.setName(txtName.getText().trim());
+        editedProduct.setDescription(txtDescription.getText().trim());
 
-        if (productService.editProduct(productId, prod)) {
+        OMEditProductCommand editComm = new OMEditProductCommand(productId, editedProduct, productService);
+        ominvoker.addCommand(editComm);
+        ominvoker.execute();
+        if (editComm.getResult()) {
             Messages.showMessageDialog("Se editó con éxito", "Atención");
             cleanControls();
             stateInitial();

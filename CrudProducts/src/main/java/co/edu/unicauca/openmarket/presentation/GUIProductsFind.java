@@ -15,19 +15,21 @@ import reloj.frameworkobsobs.Observador;
  *
  * @author Libardo Pantoja
  */
-public class GUIProductsFind extends javax.swing.JDialog implements Observador{
+public class GUIProductsFind extends javax.swing.JDialog implements Observador {
+
     private ProductService productService;
+
     /**
      * Creates new form GUIProductsFind
      */
-    public GUIProductsFind(java.awt.Frame parent, boolean modal,ProductService productService) {
+    public GUIProductsFind(java.awt.Frame parent, boolean modal, ProductService productService) {
         super(parent, modal);
         initComponents();
         initializeTable();
         this.productService = productService;
         setLocationRelativeTo(null); //centrar al ventana
     }
-    
+
     private void initializeTable() {
         tblProducts.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{},
@@ -36,8 +38,8 @@ public class GUIProductsFind extends javax.swing.JDialog implements Observador{
                 }
         ));
     }
-    
-        private void fillTable(List<Product> listProducts) {
+
+    private void fillTable(List<Product> listProducts) {
         initializeTable();
         DefaultTableModel model = (DefaultTableModel) tblProducts.getModel();
 
@@ -46,10 +48,11 @@ public class GUIProductsFind extends javax.swing.JDialog implements Observador{
             rowData[0] = listProducts.get(i).getProductId();
             rowData[1] = listProducts.get(i).getName();
             rowData[2] = listProducts.get(i).getDescription();
-            
+
             model.addRow(rowData);
         }
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -144,7 +147,6 @@ public class GUIProductsFind extends javax.swing.JDialog implements Observador{
         fillTable(productService.findAllProducts());
     }//GEN-LAST:event_btnSearchAllActionPerformed
 
- 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;

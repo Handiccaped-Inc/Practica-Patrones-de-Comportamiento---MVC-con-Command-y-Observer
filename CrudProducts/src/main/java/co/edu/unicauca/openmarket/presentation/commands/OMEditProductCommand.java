@@ -12,25 +12,32 @@ import java.util.List;
  *
  * @author ahurtado
  */
-public class OMAddProductCommand extends OMCommand {
-
-    private Product addedProduct;
+public class OMEditProductCommand extends OMCommand {
+    private Product previusState;
+    private Product newState;
     private ProductService productService;
+    private Long productId;
     boolean result=false;
-    public OMAddProductCommand(Product addedProduct, ProductService productService){
-        this.addedProduct = addedProduct;
+    
+    public OMEditProductCommand(Long productId, Product newState, ProductService productService){
+        this.productId = productId;
+        this.newState = newState;
         this.productService = productService;
     }
     
     
     @Override
     public void make() {
-        result = productService.saveProduct(addedProduct.getProductId(),addedProduct.getName(), addedProduct.getDescription());
+        //Guardar el estado anterior 
+        this.previusState = productService.findProductById(productId);
+        //Establecer el nuevo 
+        result = productService.editProduct(productId, newState);
     }
 
     @Override
     public void unmake() {
-        result = productService.deleteProduct(addedProduct.getProductId());
+        //Establecer el anterior estado
+        result = productService.editProduct(productId, previusState);
     }
     
     public boolean getResult(){

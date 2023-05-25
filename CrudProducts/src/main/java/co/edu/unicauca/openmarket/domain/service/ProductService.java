@@ -1,6 +1,5 @@
 package co.edu.unicauca.openmarket.domain.service;
 
-
 import co.edu.unicauca.openmarket.access.IProductRepository;
 import co.edu.unicauca.openmarket.domain.Product;
 import java.util.ArrayList;
@@ -11,7 +10,7 @@ import reloj.frameworkobsobs.Observado;
  *
  * @author Libardo, Julio
  */
-public class ProductService extends Observado{
+public class ProductService extends Observado {
 
     // Ahora hay una dependencia de una abstracción, no es algo concreto,
     // no sabe cómo está implementado.
@@ -27,22 +26,20 @@ public class ProductService extends Observado{
         this.repository = repository;
     }
 
+    public boolean saveProduct(Long id, String name, String description) {
 
-    public boolean saveProduct(String name, String description) {
-        
         Product newProduct = new Product();
+        newProduct.setProductId(id);
         newProduct.setName(name);
         newProduct.setDescription(description);
-        
+
         //Validate product
-        if (newProduct.getName().isBlank() ) {
+        if (newProduct.getName().isEmpty()) {
             return false;
         }
         boolean respuesta = repository.save(newProduct);
         this.notificar();
-        return respuesta ;
-        
-
+        return respuesta;
     }
 
     public List<Product> findAllProducts() {
@@ -51,12 +48,12 @@ public class ProductService extends Observado{
 
         return products;
     }
-    
-    public Product findProductById(Long id){
+
+    public Product findProductById(Long id) {
         return repository.findById(id);
     }
-    
-    public boolean deleteProduct(Long id){
+
+    public boolean deleteProduct(Long id) {
         boolean result;
         result = repository.delete(id);
         this.notificar();
@@ -64,12 +61,14 @@ public class ProductService extends Observado{
     }
 
     public boolean editProduct(Long productId, Product prod) {
-        
+
         //Validate product
-        if (prod == null || prod.getName().isBlank() ) {
+        if (prod == null || prod.getName().isEmpty()) {
             return false;
         }
-        return repository.edit(productId, prod);
+        boolean result = repository.edit(productId, prod);
+        this.notificar();
+        return result;
     }
 
 }

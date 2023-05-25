@@ -31,17 +31,18 @@ public class ProductRepository implements IProductRepository {
 
         try {
             //Validate product
-            if (newProduct == null || newProduct.getName().isBlank()) {
+            if (newProduct == null || newProduct.getName().isEmpty() || newProduct.getProductId() == null) {
                 return false;
             }
             //this.connect();
 
-            String sql = "INSERT INTO products ( name, description ) "
-                    + "VALUES ( ?, ? )";
+            String sql = "INSERT INTO products ( productId,name, description ) "
+                    + "VALUES ( ?, ?, ? )";
 
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, newProduct.getName());
-            pstmt.setString(2, newProduct.getDescription());
+            pstmt.setLong(1, newProduct.getProductId());
+            pstmt.setString(2, newProduct.getName());
+            pstmt.setString(3, newProduct.getDescription());
             pstmt.executeUpdate();
             //this.disconnect();
             return true;
@@ -80,7 +81,7 @@ public class ProductRepository implements IProductRepository {
     private void initDatabase() {
         // SQL statement for creating a new table
         String sql = "CREATE TABLE IF NOT EXISTS products (\n"
-                + "	productId integer PRIMARY KEY AUTOINCREMENT,\n"
+                + "	productId integer PRIMARY KEY,\n"
                 + "	name text NOT NULL,\n"
                 + "	description text NULL\n"
                 + ");";
@@ -131,7 +132,7 @@ public class ProductRepository implements IProductRepository {
             //this.connect();
 
             String sql = "UPDATE  products "
-                    + "SET name=?, description=? "
+                    + "SET name=?, description=?"
                     + "WHERE productId = ?";
 
             PreparedStatement pstmt = conn.prepareStatement(sql);

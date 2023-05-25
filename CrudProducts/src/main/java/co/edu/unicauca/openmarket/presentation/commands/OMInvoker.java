@@ -36,7 +36,7 @@ public class OMInvoker {
         //Se añade al historial de comandos
         myCommands.add(currentCommand);
         //Se limpia la lista de comandos desejecutados (Cuando se realiza una accion esos comandos se pierden, ese es el comportamiento normal de
-        // las apps que conocemos)
+        // las apps que conocemos, si deshacemos algo, y hacemos algo, esos que deshicimos se perdera)
         unexecutedCommands.clear();
     }
     
@@ -56,19 +56,19 @@ public class OMInvoker {
         
     }
     
+    //La implementacion es bastante parecida a la de execute, sin embargo no se puede reusar execute ya que su ultima linea es destructiva
     public void reexecute(){
         if(!unexecutedCommands.isEmpty()){
             int index = unexecutedCommands.size()-1;
-            //Obtener ese ultimo comando deshecho
-            OMCommand command= unexecutedCommands.get(index);
-            //rehacerlo
-            //Establecerlo como el comando actual
+            //Obtener el ultimo comando deshecho
+            OMCommand command= unexecutedCommands.get(index); 
+            //Establecerlo como el comand   o actual
             this.addCommand(command);
             //Ejecutar el comando actual
             currentCommand.remake();
             //Se añade al historial de comandos ejecutados
             myCommands.add(currentCommand);
-            //Remover el comando rehecho
+            //Remover el comando rehecho de la lista de desejecutados
             unexecutedCommands.remove(index);
         }
     }
