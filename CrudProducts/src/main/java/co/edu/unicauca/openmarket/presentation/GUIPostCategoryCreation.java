@@ -25,6 +25,7 @@ public class GUIPostCategoryCreation extends javax.swing.JFrame implements Obser
     OMAddCategoryCommand addCategoryCommand;
     ProductService productService;
     OMInvoker ominvoker;
+    boolean showAll = false;
 
     /**
      * Creates new form GUIPostSaveCategory
@@ -33,7 +34,7 @@ public class GUIPostCategoryCreation extends javax.swing.JFrame implements Obser
         initComponents();
         this.addCategoryCommand = addCategoryCommand;
         this.productService = productService;
-        this.lblNombreCategoria.setText(addCategoryCommand.getAddedCategory().getName() + " con Id: " + addCategoryCommand.getAddedCategory().getCategoryId());
+        this.lblNombreCategoria.setText("Seleccione los productos que desea agregar a la categoria "+addCategoryCommand.getAddedCategory().getName() + " con Id: " + addCategoryCommand.getAddedCategory().getCategoryId());
         this.ominvoker = ominvoker;
         this.btnDeshacer.setVisible(ominvoker.hasMoreCommands());
         fillTable(productService.findAllProducts());
@@ -53,7 +54,6 @@ public class GUIPostCategoryCreation extends javax.swing.JFrame implements Obser
         pnlPrincipal = new javax.swing.JPanel();
         scrlpnlProducts = new javax.swing.JScrollPane();
         tblProducts = new javax.swing.JTable();
-        lblAllProducts = new javax.swing.JLabel();
         lblNombreCategoria = new javax.swing.JLabel();
         pnlOptions = new javax.swing.JPanel();
         btnGuardarCambios = new javax.swing.JButton();
@@ -77,8 +77,6 @@ public class GUIPostCategoryCreation extends javax.swing.JFrame implements Obser
         ));
         scrlpnlProducts.setViewportView(tblProducts);
 
-        lblAllProducts.setText("Selecciona los productos que desea agregar a la categoria: ");
-
         lblNombreCategoria.setText("----");
 
         javax.swing.GroupLayout pnlPrincipalLayout = new javax.swing.GroupLayout(pnlPrincipal);
@@ -87,22 +85,16 @@ public class GUIPostCategoryCreation extends javax.swing.JFrame implements Obser
             pnlPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlPrincipalLayout.createSequentialGroup()
                 .addGap(40, 40, 40)
-                .addComponent(scrlpnlProducts, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addGroup(pnlPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblNombreCategoria, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(scrlpnlProducts))
                 .addGap(40, 40, 40))
-            .addGroup(pnlPrincipalLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblAllProducts, javax.swing.GroupLayout.PREFERRED_SIZE, 289, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lblNombreCategoria)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlPrincipalLayout.setVerticalGroup(
             pnlPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlPrincipalLayout.createSequentialGroup()
                 .addGap(22, 22, 22)
-                .addGroup(pnlPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblAllProducts)
-                    .addComponent(lblNombreCategoria))
+                .addComponent(lblNombreCategoria)
                 .addGap(18, 18, 18)
                 .addComponent(scrlpnlProducts, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
                 .addGap(20, 20, 20))
@@ -110,7 +102,7 @@ public class GUIPostCategoryCreation extends javax.swing.JFrame implements Obser
 
         pnlOptions.setLayout(new java.awt.GridBagLayout());
 
-        btnGuardarCambios.setText("Guardar Cambios");
+        btnGuardarCambios.setText("Añadir Productos (Si no hay seleccionados solo guarda la categoria)");
         btnGuardarCambios.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnGuardarCambiosActionPerformed(evt);
@@ -138,7 +130,7 @@ public class GUIPostCategoryCreation extends javax.swing.JFrame implements Obser
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlOptions, javax.swing.GroupLayout.DEFAULT_SIZE, 513, Short.MAX_VALUE)
+            .addComponent(pnlOptions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(pnlPrincipal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -160,20 +152,20 @@ public class GUIPostCategoryCreation extends javax.swing.JFrame implements Obser
 
     private void btnGuardarCambiosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarCambiosActionPerformed
         //Obtener los indices seleccionados
-        
+
         ArrayList<Integer> indexes = new ArrayList<>();
         int[] selectedIndexes = this.tblProducts.getSelectedRows();
-        
+
         for (int index : selectedIndexes) {
             indexes.add(index);
         }
         //Obtener todos los productos (Estan indexados igual a la tabla)
         List<Product> allProducts = productService.findAllProducts();
-        
+
         //Filtrar los que estan seleccionados
         ArrayList<Product> productsToCategorize = new ArrayList<>();
         for (int i = 0; i < allProducts.size(); i++) {
-            if(indexes.contains(i)){
+            if (indexes.contains(i)) {
                 productsToCategorize.add(allProducts.get(i));
             }
         }
@@ -186,12 +178,16 @@ public class GUIPostCategoryCreation extends javax.swing.JFrame implements Obser
             Messages.showMessageDialog("Error al grabar, lo siento mucho", "Atención");
         }
         this.btnDeshacer.setVisible(ominvoker.hasMoreCommands());
+        showAll = false;
 
     }//GEN-LAST:event_btnGuardarCambiosActionPerformed
 
     private void btnDeshacerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeshacerActionPerformed
+        showAll = true;
         ominvoker.unexecute();
         this.btnDeshacer.setVisible(ominvoker.hasMoreCommands());
+        tblProducts.setRowSelectionAllowed(true);
+
     }//GEN-LAST:event_btnDeshacerActionPerformed
     private void fillTable(List<Product> listProducts) {
         this.tblProducts.setModel(new javax.swing.table.DefaultTableModel(
@@ -219,7 +215,6 @@ public class GUIPostCategoryCreation extends javax.swing.JFrame implements Obser
     private javax.swing.JButton btnGuardarCambios;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JLabel lblAllProducts;
     private javax.swing.JLabel lblNombreCategoria;
     private javax.swing.JPanel pnlOptions;
     private javax.swing.JPanel pnlPrincipal;
@@ -229,7 +224,11 @@ public class GUIPostCategoryCreation extends javax.swing.JFrame implements Obser
 
     @Override
     public void actualizar() {
-        fillTable(productService.findProductByCategory(addCategoryCommand.getAddedCategory().getCategoryId()));
+        if (showAll) {
+            fillTable(productService.findAllProducts());
+        } else {
+            fillTable(productService.findProductByCategory(addCategoryCommand.getAddedCategory().getCategoryId()));
+        }
         tblProducts.setRowSelectionAllowed(false);
     }
 }
