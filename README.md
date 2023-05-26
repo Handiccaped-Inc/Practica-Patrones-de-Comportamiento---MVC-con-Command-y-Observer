@@ -1,5 +1,8 @@
 # Practica-Patrones-de-Comportamiento---MVC-con-Command-y-Observer
-Integrantes: Jojan Esteban Serna Serna
+Integrantes: 
+- Santiago Agredo Vallejo
+- Pablo Jose Restrepo Ruiz
+- Jojan Esteban Serna Serna
 # Instrucciones de ejecucion
 ## Instalar `frameworkobsobs`
 - Navegar al proyecto y en la carpeta donde esta el `pom.xml` y ejecutar `mvn clean install`
