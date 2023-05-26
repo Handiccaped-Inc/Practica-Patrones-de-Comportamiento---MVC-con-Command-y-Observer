@@ -13,12 +13,12 @@ import java.util.List;
  */
 public class OMInvoker {
     
-    private List<OMCommand> myCommands;
+    private List<OMCommand> executedCommands;
     private List<OMCommand> unexecutedCommands;
     private OMCommand currentCommand;
     
     public OMInvoker(){
-        myCommands = new ArrayList<>();
+        executedCommands = new ArrayList<>();
         unexecutedCommands = new ArrayList<>();
         currentCommand=null;
     }
@@ -34,22 +34,22 @@ public class OMInvoker {
         //Se ejecuta el comando actual
         currentCommand.make();
         //Se añade al historial de comandos
-        myCommands.add(currentCommand);
+        executedCommands.add(currentCommand);
         //Se limpia la lista de comandos desejecutados (Cuando se realiza una accion esos comandos se pierden, ese es el comportamiento normal de
         // las apps que conocemos, si deshacemos algo, y hacemos algo, esos que deshicimos se perdera)
         unexecutedCommands.clear();
     }
     
     public void unexecute(){
-        if (!myCommands.isEmpty()){
+        if (!executedCommands.isEmpty()){
             //Obtener el indice del ultimo comando ejecutado
-            int index = myCommands.size()-1;
+            int index = executedCommands.size()-1;
             //Obtener ese ultimo comando
-            OMCommand unexecutedCommand= myCommands.get(index);
+            OMCommand unexecutedCommand= executedCommands.get(index);
             //Deshacerlo
             unexecutedCommand.unmake();
             //Remover el comando deshecho
-            myCommands.remove(index);
+            executedCommands.remove(index);
             //Añadir el comando a los comandos deshechos
             unexecutedCommands.add(unexecutedCommand);
         }
@@ -67,7 +67,7 @@ public class OMInvoker {
             //Ejecutar el comando actual
             currentCommand.remake();
             //Se añade al historial de comandos ejecutados
-            myCommands.add(currentCommand);
+            executedCommands.add(currentCommand);
             //Remover el comando rehecho de la lista de desejecutados
             unexecutedCommands.remove(index);
         }
@@ -76,10 +76,32 @@ public class OMInvoker {
     
     
     public boolean hasMoreCommands(){
-        return !myCommands.isEmpty();
+        return !executedCommands.isEmpty();
     }
     
     public boolean hasUnexecutedCommands(){
         return !unexecutedCommands.isEmpty();
     }
+
+    public Object getCurrentCommand() {
+        return currentCommand;
+    }
+
+    public List<OMCommand> getExecutedCommands() {
+        return executedCommands;
+    }
+
+    public void setExecutedCommands(List<OMCommand> executedCommands) {
+        this.executedCommands = executedCommands;
+    }
+
+    public List<OMCommand> getUnexecutedCommands() {
+        return unexecutedCommands;
+    }
+
+    public void setUnexecutedCommands(List<OMCommand> unexecutedCommands) {
+        this.unexecutedCommands = unexecutedCommands;
+    }
+    
+    
 }
